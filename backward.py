@@ -10,11 +10,11 @@ import numpy as np
 from utils import *
 
 def conv_back(dZ, cache):
-    #提取参数
+    # Abstract parameters from cache
     (A_prev, W, b, conv_s) = cache
     (f, f, n_c_prev, n_c) = W.shape
     (m, n_h, n_w, n_c) = dZ.shape
-    # 初始化输出值
+    # initialize the outputs
     dA_prev = np.zeros(A_prev.shape)
     dW = np.zeros(W.shape)
     db = np.zeros((1, n_c))
@@ -27,7 +27,7 @@ def conv_back(dZ, cache):
                     w_start = w * conv_s
                     w_end = w_start + f
                     a_prev_slice = A_prev[i, h_start:h_end, w_start:w_end, :]
-                    #求对filter的导数
+                    # get the derivatives
                     dW[:, :, :, c] += a_prev_slice * dZ[i, h, w, c]
                     db[:, c] += dZ[i, h, w, c]
                     dA_prev[i, h_start:h_end, w_start:w_end, :] += W[:, :, :, c] * dZ[i, h, w, c]
@@ -36,10 +36,10 @@ def conv_back(dZ, cache):
     return dA_prev, dW, db
 
 def maxpool_back(dA, cache):
-    #提取cache
+    # abstract cache
     (A_prev, pool_f, pool_s) = cache
     (m, n_h, n_w, n_c) = dA.shape
-    # 初始化输出值
+    # initialize output
     dA_prev = np.zeros(A_prev.shape)
     for i in range(m):
         for c in range(n_c):
@@ -60,7 +60,7 @@ def fc_back(AL, cache, X, Y, paras):
     (A4, Z4, A3, Z3) = cache
     (W3, b3, W4, b4) = paras
 
-    dZ4 = AL - Y  # (10,m)
+    dZ4 = AL - Y  # (10,m) m is number of samples
     dW4 = np.dot(dZ4, A3.T)  # (10,128)
     db4 = np.sum(dZ4, axis=1).reshape(b4.shape)  # (10,1)
 

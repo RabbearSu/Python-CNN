@@ -22,7 +22,7 @@ def train(img_dim,
           beta2,
           num_epochs,
           save_path):
-    #初始化参数
+
     paras = init_paras(img_dim, img_depth, f1, f2, num_f1, num_f2)
     train_data, test_data = get_data_cifar10()
     cost = []

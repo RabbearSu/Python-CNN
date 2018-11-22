@@ -10,15 +10,15 @@ from utils import *
 
 def conv_forward(A_prev, W, b, conv_s):
     #print('W.shape:{}, b.shape:{}'.format(W.shape,b.shape))
-    #提取参数
+    # abstract parameters
     (m, n_h_prev, n_w_prev, n_c_prev) = A_prev.shape
     (f, f, n_c_prev, n_c) = W.shape
-    #卷激后的h和w的大小
+    # the output shape 
     n_h = int((n_h_prev - f) / conv_s) + 1
     n_w = int((n_w_prev - f) / conv_s) + 1
-    #初始化输出值
+    # initialize output using zeros
     z = np.zeros((m, n_h, n_w, n_c))
-    #遍历Z的所有维度进行卷积
+    # go through all demensions of z
     for i in range(m):
         for h in range(n_h):
             for w in range(n_w):
@@ -34,15 +34,15 @@ def conv_forward(A_prev, W, b, conv_s):
     return z, cache
 
 def maxpool_forward(A_prev, pool_f, pool_s):
-    #提取参数
+    # abstract parameters
     (m, n_h_prev, n_w_prev, n_c_prev) = A_prev.shape
-    #Pooling后的h和w大小
+    # the shape after pooling
     n_h = int((n_h_prev - pool_f) / pool_s) + 1
     n_w = int((n_w_prev - pool_f) / pool_s) + 1
     n_c = n_c_prev
-    #初始化pooling后的输出
+    # initial output using zeros
     z = np.zeros((m, n_h, n_w, n_c))
-    #遍历z的所有维度进行卷积
+    # go through all demensions of z
     for i in range(m):
         for h in range(n_h):
             for w in range(n_w):
@@ -57,7 +57,7 @@ def maxpool_forward(A_prev, pool_f, pool_s):
     cache = (A_prev, pool_f, pool_s)
     return z, cache
 
-#全连接层的卷积
+# forward pass in fully connected layers
 def fc_forward(X, paras_fc):
     (W3, b3, W4, b4) = paras_fc
     Z3 = np.dot(W3, X) + b3
@@ -67,6 +67,6 @@ def fc_forward(X, paras_fc):
     cache = (A4, Z4, A3, Z3)
     return A4, cache
 
-#softmax entropy
+# softmax entropy
 def categoricalCrossEntropy(labels, probs):
     return -np.sum(labels * np.log(probs))

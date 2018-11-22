@@ -14,50 +14,51 @@ def network(inputs, targets, parameters, conv_s, pool_s, pool_f):
     (W1, W2, W3, W4, b1, b2, b3, b4) = parameters
 
     ############### Forward Operation ################
-    Z1, cache_conv1 = conv_forward(A_prev=inputs, W=W1, b=b1, conv_s=conv_s)  # 1st卷积层的forward pass
-    A1 = relu_forward(Z1)  # 1st卷积层的activation output
-    Z2, cache_conv2 = conv_forward(A_prev=A1, W=W2, b=b2, conv_s=conv_s)  # 2nd卷积层的forward pass
-    A2 = relu_forward(Z2)  # 2nd卷积层的activation output
-    pool, cache_pool = maxpool_forward(A_prev=A2, pool_f=pool_f, pool_s=pool_s)  # Pooling层的forward pass
+    Z1, cache_conv1 = conv_forward(A_prev=inputs, W=W1, b=b1, conv_s=conv_s)  # 1st convolution layer forward pass
+    A1 = relu_forward(Z1)  # 1st convolution layer activation 
+    Z2, cache_conv2 = conv_forward(A_prev=A1, W=W2, b=b2, conv_s=conv_s)  # 2nd convolution layer forward pass
+    A2 = relu_forward(Z2)  # 2nd convolution layer activation 
+    pool, cache_pool = maxpool_forward(A_prev=A2, pool_f=pool_f, pool_s=pool_s)  # Pooling layer forward pass
 
-    FL = pool.reshape(pool.shape[0], -1).T  # 将Pooling层的输出AP压平并转置为维度(9216, m)
-    probs, cache_fc = fc_forward(X=FL, paras_fc=(W3, b3, W4, b4))  # 全连接层的前向传播
+    FL = pool.reshape(pool.shape[0], -1).T  # flatten 'pool' layer and transpose to (9216,m) 
+    probs, cache_fc = fc_forward(X=FL, paras_fc=(W3, b3, W4, b4))  # forward pass in fully connected layers
 
     ################## Compute Cost ##################
 
-    m = targets.shape[-1] #样本数
+    m = targets.shape[-1] # number of samples
     loss = (1/m) * categoricalCrossEntropy(targets, probs)
 
     ################ Backward Operation ##############
-    (dW3, db3, dW4, db4), dFL = fc_back(AL=probs, X=FL, Y=targets, cache=cache_fc, paras=(W3, b3, W4, b4))  # 全连接层的BP
+    (dW3, db3, dW4, db4), dFL = fc_back(AL=probs, X=FL, Y=targets, cache=cache_fc, paras=(W3, b3, W4, b4))  # backward pass in fully connected layers
 
-    dpool = dFL.T.reshape(pool.shape)  # 将flat后的pooling层还原为原来的维度
+    dpool = dFL.T.reshape(pool.shape)  # restore the shape of dpool
 
-    dA2 = maxpool_back(dA=dpool, cache=cache_pool)  # 第二层卷积的激活后的A2的导数
-    dZ2 = dA2 * relu_back(Z2)  # 第二层卷积输出Z2的导数
+    dA2 = maxpool_back(dA=dpool, cache=cache_pool)  
+    dZ2 = dA2 * relu_back(Z2)  
 
-    dA1, dW2, db2 = conv_back(dZ=dZ2, cache=cache_conv2)  # 第二层卷积的参数W,b和第一层输出激活A1的导数
-    dZ1 = dA1 * relu_back(Z1)  # 第一层卷积的输出Z1的导数
+    dA1, dW2, db2 = conv_back(dZ=dZ2, cache=cache_conv2)  
+    dZ1 = dA1 * relu_back(Z1)  
 
-    d_inputs, dW1, db1 = conv_back(dZ=dZ1, cache=cache_conv1)  # 第二层卷积的参数W,b和输入X的导数
+    d_inputs, dW1, db1 = conv_back(dZ=dZ1, cache=cache_conv1)  
 
     grads = (dW1/m, dW2/m, dW3/m, dW4/m, db1/m, db2/m, db3/m, db4/m)
     return grads, loss
 
 
 def adam(img_dim, img_depth, batch, paras, lr, beta1, beta2, cost):
-    # 提取参数
+
     (W1, W2, W3, W4, b1, b2, b3, b4) = paras
-    # 获取输入和输出
+
     #print(batch[:,0:-1].shape)
     X = batch[:, 0:-1].reshape(len(batch), img_dim, img_dim, img_depth)
     # one-hot encode
     Y = batch[:, -1].astype(int)
     Y = np.eye(10)[Y].T
-    # 更新参数
+    # get grads and loss 
     grads, loss = network(X, Y, paras, conv_s=1, pool_f=2, pool_s=2)
     (dW1, dW2, dW3, dW4, db1, db2, db3, db4) = grads
-
+    
+    # do adam optimisation
     v1 = np.zeros(W1.shape)
     v2 = np.zeros(W2.shape)
     v3 = np.zeros(W3.shape)

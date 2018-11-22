@@ -10,7 +10,9 @@ This project concludes following files:
 - main.py
 
 **Usage**
-In terminal<br>
+- In terminal<br>
 ```
 python main.py 
 ```
+- or import projects into IDE
+

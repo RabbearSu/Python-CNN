@@ -61,10 +61,6 @@ ENV/
 env.bak/
 venv.bak/
 
-# Spyder project settings
-.spyderproject
-.spyproject
-
 # Rope project settings
 .ropeproject
 
@@ -73,6 +69,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
 ### Windows template
 # Windows thumbnail cache files
 Thumbs.db
@@ -100,6 +97,8 @@ $RECYCLE.BIN/
 
 # Projects
 *.pkl
+mnist_train_small.csv
+/data
 
 
 

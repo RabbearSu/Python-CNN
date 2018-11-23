@@ -97,8 +97,7 @@ $RECYCLE.BIN/
 
 # Projects
 *.pkl
-mnist_train_small.csv
-/data
+
 
 
 
